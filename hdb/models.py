@@ -1,5 +1,8 @@
 from django.db.models import *
 from django.contrib.auth.models import User
+from IPy import IP
+from django.core.exceptions import ValidationError
+
 # Create your models here.
 #not null by default
 
@@ -47,6 +50,11 @@ class Address(Model):
 	mac = CharField(max_length=17, null=True)
 	address = CharField(max_length=39)
 	#validate wether it is ipv4 or ipv6
+	def clean(self):
+		try:
+			IP(address)
+		except:
+			raise ValidationError('Invalid IP address')
 		
 class DHCPHost(Model):
 	address = ForeignKey(Address)
@@ -66,7 +74,7 @@ class DNSRecord(Model):
 	zone = ForeignKey(DNSZone)
 	dnsrecord = ForeignKey("self", null=True, related_name='child_records')
 	type = CharField(max_length=5, choices=DNS_TYPE_CHOICES)
-	record = TextField(max_length=1024)
+	record = TextField(max_length=1024) #This shouldn't be edited? should it be generated?
 	
 class DHCPOption(Model):
 	"""
@@ -74,8 +82,6 @@ class DHCPOption(Model):
 	These should not be things like hardware-ethernet address
 	or the ip address allocated, these are derived from the DHCPhost
 	Things like router, gateway, bootfile .... 
-
-	Perhaps this should be arbitrary key value pairs?
 	"""
 	name = CharField(max_length=255)
 	code = CharField(max_length=255, primary_key=True)
