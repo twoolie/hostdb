@@ -18,11 +18,11 @@ class DNSZone(Model):
 	#fk email to a user?
 	def __unicode__(self):
 		return self.zonename
-		
+
 class DHCPScope(Model):
 	"""
 	This represents a DHCP segment, with the first being
-	Global, the rest being segments one node down. These 
+	Global, the rest being segments one node down. These
 	Fields are all nullable, as they can come from the global zone
 	"""
 	#One zone should be called "global" and specify no range
@@ -40,7 +40,7 @@ class Host(Model):
 	location = CharField(max_length=255)
 	def __unicode__(self):
 		return self.hostname + '.' + self.zone.zonename
-	
+
 class Address(Model):
 	IPv4 = 4; IPv6 = 6
 	IP_TYPE_CHOICES = (	(IPv4, 'IPv4'), (IPv6, 'IPv6'), )
@@ -56,12 +56,13 @@ class Address(Model):
 		except:
 			raise ValidationError('Invalid IP address')
 		
+
 class DHCPHost(Model):
 	address = ForeignKey(Address)
 	#Foreign key to a set of DHCP options .... ?
 	#Only if this is ipv6
 	duid = CharField(max_length=255)
-	
+
 class DNSRecord(Model):
 	DNS_TYPE_CHOICES = (
 		('A', 'A'),
@@ -69,25 +70,29 @@ class DNSRecord(Model):
 		('NS', 'NS'),
 		('CNAME', 'CNAME'),
 		('MX', 'MX'),
+		('TXT', 'TXT'),
+		('HINFO', 'HINFO'),
+
 	)
 	address = ForeignKey(Address)
 	zone = ForeignKey(DNSZone)
 	dnsrecord = ForeignKey("self", null=True, related_name='child_records')
 	type = CharField(max_length=5, choices=DNS_TYPE_CHOICES)
 	record = TextField(max_length=1024) #This shouldn't be edited? should it be generated?
-	
+
 class DHCPOption(Model):
 	"""
 	This is a list of options that can be applied to DHCP object
 	These should not be things like hardware-ethernet address
 	or the ip address allocated, these are derived from the DHCPhost
 	Things like router, gateway, bootfile .... 
+
 	"""
 	name = CharField(max_length=255)
 	code = CharField(max_length=255, primary_key=True)
 	def __unicode__(self):
 		return self.name
-		
+
 class DHCPValue(Model):
 	scope = ForeignKey(DHCPScope, null=True, blank=True)
 	host = ForeignKey(DHCPHost, null=True, blank=True)

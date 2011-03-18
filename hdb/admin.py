@@ -43,6 +43,6 @@ admin.site.register(DHCPOption, DHCPOptionAdmin)
 
 class DHCPValueAdmin(admin.ModelAdmin):
 	list_display = ['scope', 'host', 'option', 'value']
-	
+
 admin.site.register(DHCPValue, DHCPValueAdmin)
 
