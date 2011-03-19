@@ -11,7 +11,7 @@ class DNSZone(Model):
 	This is a DNS zone, and represents both a view in named.conf
 	But also a zone file that is generated from related addresses
 	"""
-	zonename = TextField(max_length=1024)
+	zonename = TextField(max_length=1024, unique=True)
 	#ACL's
 	#Permissions
 	ttl = IntegerField()
@@ -72,7 +72,6 @@ class DNSRecord(Model):
 		('MX', 'MX'),
 		('TXT', 'TXT'),
 		('HINFO', 'HINFO'),
-
 	)
 	address = ForeignKey(Address)
 	zone = ForeignKey(DNSZone)
@@ -86,7 +85,6 @@ class DHCPOption(Model):
 	These should not be things like hardware-ethernet address
 	or the ip address allocated, these are derived from the DHCPhost
 	Things like router, gateway, bootfile .... 
-
 	"""
 	name = CharField(max_length=255)
 	code = CharField(max_length=255, primary_key=True)
